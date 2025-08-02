@@ -10,18 +10,37 @@ alwaysApply: true
 
 ## 🚀 快速启动检查
 
-### 状态检查（仅首次或变更时）
+### 状态检查（智能条件判断）
 ```javascript
-// 伪代码：智能状态检查逻辑
-if (!exists('.cursor/project-initialized') || user_request_init) {
-  // 引用：project-initialization.mdc
-  show_initialization_prompt();
-} else if (tech_stack_changed()) {
-  // 引用：技术栈更新机制
-  show_update_prompt();
-} else {
-  // 直接进入协作模式
-  proceed_with_collaboration();
+// 精确条件判断逻辑 - AI请严格按此逻辑执行
+function intelligentStatusCheck() {
+  // 条件1: 强制初始化场景
+  if (!exists('.cursor/project-initialized') || 
+      user_explicitly_requests_init ||
+      session_is_first_conversation) {
+    return LOAD('project-initialization.mdc');
+  }
+  
+  // 条件2: 技术栈变更检测
+  if (file_modified('package.json') || 
+      file_modified('requirements.txt') ||
+      file_modified('pom.xml') ||
+      file_modified('Cargo.toml')) {
+    return PROMPT_TECH_STACK_UPDATE();
+  }
+  
+  // 条件3: 长时间未检查
+  if (last_check_time > 24_hours) {
+    return LIGHT_STATUS_VALIDATION();
+  }
+  
+  // 条件4: 同会话继续 - 直接协作
+  if (same_session_continuation) {
+    return SKIP_ALL_CHECKS();
+  }
+  
+  // 默认: 进入协作模式
+  return PROCEED_COLLABORATION();
 }
 ```
 
@@ -35,28 +54,53 @@ if (!exists('.cursor/project-initialized') || user_request_init) {
 - **执行策略**：超限 → 停止操作 → 强制分离
 
 ### 2. 智能决策边界
-```markdown
-立即执行: bug修复、格式化、安全修复、性能优化
-需要确认: 新功能、API变更、依赖变更
-必须审查: 业务逻辑、数据库变更、权限变更
-禁止自主: 生产部署、数据删除、破坏性操作
-```
 
-### 3. 专用规则文件引用
-```markdown
-协作交互 → collaboration-standards.mdc
-项目管理 → project-management-practices.mdc  
-规则管理 → rule-file-management.mdc
-初始化流程 → project-initialization.mdc
-技术栈规则 → <tech-stack>-v<version>-standards.mdc
+| 决策级别 | 操作类型 | 典型示例 | 执行方式 |
+|----------|----------|----------|----------|
+| **立即执行** | Bug修复、代码优化 | 语法错误、格式化、安全漏洞、性能优化 | 无需确认，直接执行 |
+| **需要确认** | 功能变更 | 新功能、API变更、依赖升级、配置修改 | 说明后等待用户确认 |
+| **必须审查** | 核心业务 | 业务逻辑、数据库变更、权限设置 | 详细说明+强制用户审查 |
+| **禁止自主** | 高风险操作 | 生产部署、数据删除、破坏性重构 | 绝不自主执行 |
+
+### 3. 专用规则文件引用（智能加载逻辑）
+
+| 场景类型 | 规则文件 | 精确加载条件 | 跳过条件 | 优先级 |
+|----------|----------|-------------|----------|--------|
+| **协作交互** | collaboration-standards.mdc | 需要格式化回复 OR 涉及决策边界判断 | 纯技术问题且无格式要求 | 高 |
+| **项目管理** | project-management-practices.mdc | 提及"环境"/"团队"/"部署"/"监控" | 单纯代码修改任务 | 中 |
+| **规则管理** | rule-file-management.mdc | 用户要求生成规则 OR 同问题出现≥2次 | 首次遇到的新问题 | 中 |
+| **初始化流程** | project-initialization.mdc | 无`.cursor/project-initialized` OR 用户明确要求 | 已初始化且无技术栈变更 | 最高 |
+| **技术栈专用** | `<tech-stack>-v<version>-standards.mdc` | 代码涉及特定技术栈操作 | 通用规则即可解决 | 高 |
+
+```javascript
+// 智能加载判断函数
+function shouldLoadRuleFile(fileType, context) {
+  // 快速跳过逻辑
+  if (context.is_simple_bug_fix && !context.requires_formatting) {
+    return SKIP_MOST_RULES();
+  }
+  
+  // 条件加载逻辑
+  switch(fileType) {
+    case 'collaboration':
+      return context.needs_reply_format || context.needs_decision_boundary;
+    case 'project-management':
+      return /环境|团队|部署|监控|质量/.test(context.user_request);
+    case 'rule-management':
+      return context.repeated_problem_count >= 2;
+    default:
+      return true; // 默认加载
+  }
+}
 ```
 
 ### 4. 问题处理快速决策
-```markdown
-第1次问题: 正常解决
-第2次重复: 启动标准复盘 → 记录到docs/问题解决/
-第3次失败: 强制深度复盘 → 风险等级提升 → 专家介入
-```
+
+| 问题次数 | 处理策略 | 必须执行 | 记录要求 |
+|----------|----------|----------|----------|
+| **第1次** | 正常解决 | 分析根因 + 修复 | 简要记录解决方案 |
+| **第2次重复** | 标准复盘 | 深度分析 + 模式识别 | 记录到 `docs/问题解决/` |
+| **第3次失败** | 强制深度复盘 | 风险等级提升 + 专家介入 | 完整复盘报告 + 预防措施 |
 
 ### 5. Git操作禁令
 **绝对禁止**：执行任何 `git` 命令（add, commit, push 等）
@@ -66,30 +110,61 @@ if (!exists('.cursor/project-initialized') || user_request_init) {
 
 ## 🎯 快速引用表
 
-### 常见场景 → 规则文件映射
-| 场景 | 引用文件 | 加载时机 |
-|------|----------|----------|
-| 首次协作 | project-initialization.mdc | 检测到未初始化 |
-| 协作交互 | collaboration-standards.mdc | 需要格式化回复时 |
-| 项目管理 | project-management-practices.mdc | 涉及环境/团队问题 |
-| 技术栈问题 | tech-stack专用规则 | 检测到对应技术栈 |
-| 规则管理 | rule-file-management.mdc | 需要生成新规则时 |
+### 常见场景 → 规则文件映射 + 引用跟踪
+
+| 场景 | 引用文件 | 加载时机 | 必须在回复中显示 |
+|------|----------|----------|-----------------|
+| **首次协作** | project-initialization.mdc | 检测到未初始化 | `🚀 项目初始化 → [执行阶段]` |
+| **协作交互** | collaboration-standards.mdc | 需要格式化回复时 | `🤝 协作规范 → [格式化应用]` |
+| **项目管理** | project-management-practices.mdc | 涉及环境/团队问题 | `📊 项目管理 → [具体场景]` |
+| **技术栈问题** | tech-stack专用规则 | 检测到对应技术栈 | `🔧 [技术栈名] → [版本+操作]` |
+| **规则管理** | rule-file-management.mdc | 需要生成新规则时 | `⚙️ 规则管理 → [生成/修改]` |
+
+> 📋 **强制要求**: AI每次回复都必须按照 `collaboration-standards.mdc` 的引用跟踪格式显示使用的具体规则
 
 ### 质量标准快速判断
-```markdown
-生产环境: 最高标准 + 完整测试 + 详细文档
-开发环境: 平衡质量效率 + 重点功能
-原型环境: 快速验证 + 可接受技术债务
-```
+
+| 环境类型 | 质量要求 | 测试标准 | 文档要求 | 技术债务 |
+|----------|----------|----------|----------|----------|
+| **生产环境** | 最高标准 | 完整测试覆盖 | 详细文档 | 禁止 |
+| **开发环境** | 平衡质量效率 | 重点功能测试 | 核心文档 | 最小化 |
+| **原型环境** | 快速验证 | 基础功能验证 | 简要说明 | 可接受 |
 
 ---
 
-## 📋 核心价值观（快速决策原则）
+## 📋 核心价值观（智能决策原则）
 
-1. **规则遵循 > 开发便利** - 500行限制不可违背
-2. **质量 > 速度** - 稳定性优先
-3. **安全 > 便利** - 安全选择优先
-4. **团队协作 > 个人效率** - 代码可维护性优先
+| 价值观原则 | 强制执行条件 | 可适度调整条件 | 判断逻辑 |
+|------------|-------------|---------------|----------|
+| **规则遵循 > 开发便利** | 文件≥500行 OR 违反核心规则 | 无 - 绝对不可违背 | `if (file_lines >= 500) FORCE_SPLIT()` |
+| **质量 > 速度** | 生产环境 OR 核心业务逻辑 | 原型环境的快速验证 | `if (env == 'production') MAX_QUALITY()` |
+| **安全 > 便利** | 涉及权限/数据/密钥 | 开发环境的调试便利 | `if (involves_security) SECURITY_FIRST()` |
+| **团队协作 > 个人效率** | 多人协作项目 | 个人学习项目 | `if (team_project) READABLE_CODE()` |
+
+```javascript
+// 价值观决策算法
+function applyValuePrinciple(action, context) {
+  // 铁律检查 - 无条件执行
+  if (context.file_lines >= 500) {
+    return FORCE_FILE_SPLIT();
+  }
+  
+  // 安全优先检查
+  if (action.involves_security || action.affects_permissions) {
+    return REQUIRE_SECURITY_REVIEW();
+  }
+  
+  // 环境适应性检查
+  if (context.environment === 'production') {
+    return APPLY_HIGHEST_STANDARDS();
+  } else if (context.environment === 'prototype') {
+    return ALLOW_TECHNICAL_DEBT();
+  }
+  
+  // 默认平衡策略
+  return BALANCED_APPROACH();
+}
+```
 
 ---
 
@@ -101,18 +176,16 @@ if (!exists('.cursor/project-initialized') || user_request_init) {
 - **快速跳过**：已初始化且无变更 → 直接进入协作模式
 
 ### 智能触发机制
-```markdown
-触发初始化检查:
-- 首次对话
-- 用户明确要求
-- 检测到 package.json 等关键文件变更
-- 距离上次检查超过24小时
 
-跳过初始化检查:
-- .cursor/project-initialized 存在且有效
-- 技术栈无变更
-- 用户在同一会话中继续对话
-```
+| 触发类型 | 条件检查 | 执行动作 | 优先级 |
+|----------|----------|----------|--------|
+| **触发初始化** | 首次对话 | 完整初始化流程 | 最高 |
+| **触发初始化** | 用户明确要求 | 按用户需求执行 | 最高 |
+| **触发初始化** | 关键文件变更 (package.json等) | 增量更新检查 | 高 |
+| **触发初始化** | 距离上次检查>24小时 | 状态验证 | 中 |
+| **跳过检查** | `.cursor/project-initialized` 存在且有效 | 直接协作模式 | - |
+| **跳过检查** | 技术栈无变更 | 直接协作模式 | - |
+| **跳过检查** | 同一会话继续对话 | 直接协作模式 | - |
 
 ---
 
