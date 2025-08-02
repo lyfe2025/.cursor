@@ -731,24 +731,24 @@ detect_tech_stack() {
     echo ""
 }
 
-# 添加.cursor到.gitignore
+# 更新已存在的.gitignore文件（不创建新文件）
 update_gitignore() {
-    log_step "更新 .gitignore 配置..."
+    log_step "检查 .gitignore 配置..."
     
-    if [ ! -f ".gitignore" ]; then
-        log_info "创建 .gitignore 文件"
-        touch .gitignore  
-    fi
-    
-    # 检查是否已经包含.cursor相关配置
-    if ! grep -q ".cursor" .gitignore; then
-        echo "" >> .gitignore
-        echo "# Cursor IDE 规则配置（可选：如果团队共享规则则注释掉下面的行）" >> .gitignore
-        echo "# .cursor/" >> .gitignore
-        log_success "已更新 .gitignore（.cursor 配置默认被提交到版本控制）"
-        log_info "如果不希望提交 .cursor 配置，请取消注释 .gitignore 中的相关行"
+    # 只有在.gitignore文件已经存在时才进行更新
+    if [ -f ".gitignore" ]; then
+        # 检查是否已经包含.cursor相关配置
+        if ! grep -q ".cursor" .gitignore; then
+            echo "" >> .gitignore
+            echo "# Cursor IDE 规则配置（可选：如果团队共享规则则注释掉下面的行）" >> .gitignore
+            echo "# .cursor/" >> .gitignore
+            log_success "已更新现有 .gitignore（.cursor 配置默认被提交到版本控制）"
+            log_info "如果不希望提交 .cursor 配置，请取消注释 .gitignore 中的相关行"
+        else
+            log_info ".gitignore 已包含 .cursor 配置，跳过"
+        fi
     else
-        log_info ".gitignore 已包含 .cursor 配置，跳过"
+        log_info "未发现 .gitignore 文件，跳过配置（.cursor 配置将正常提交到版本控制）"
     fi
 }
 
@@ -765,7 +765,7 @@ show_completion() {
     echo "  ✅ 创建了标准项目目录结构" 
     echo "  ✅ 生成了 scripts.sh 交互式脚本入口"
     echo "  ✅ 检测了项目技术栈"
-    echo "  ✅ 更新了 .gitignore 配置"
+    echo "  ✅ 检查了 .gitignore 配置（仅在文件已存在时更新）"
     echo ""
     
     echo -e "${YELLOW}🚀 后续步骤：${NC}"
