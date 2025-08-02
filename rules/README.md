@@ -14,36 +14,42 @@
 - **问题驱动改进**：重复问题自动转化为规则文件，持续优化开发体验
 - **多技术栈适配**：支持自动识别项目技术栈并应用相应的最佳实践
 
-## 🚀 快速开始
+## 🚀 一键安装
 
-### 在新项目中使用
+```bash
+# 进入你的项目根目录，然后执行一键安装命令：
+cd your-new-project
 
-1. **进入项目根目录**
-   ```bash
-   cd your-new-project
-   ```
+# 推荐方法
+bash <(curl -s https://raw.githubusercontent.com/lyfe2025/.cursor/main/rules/setup-rules.sh)
 
-2. **拉取规则配置**
-   ```bash
-   git clone https://github.com/lyfe2025/.cursor.git
-   ```
+# 备选方法
+curl -fsSL https://raw.githubusercontent.com/lyfe2025/.cursor/main/rules/setup-rules.sh | bash
+```
 
-3. **验证配置**
-   - 重启 Cursor IDE
-   - Cursor 将自动检测并应用 `.cursor/rules/` 目录下的规则文件
-   - 首次使用时会自动识别技术栈并生成专用规则文件
+**🚀 一键脚本功能：**
+- ✅ **自动检查并安装Git环境**（如果未安装）
+- ✅ **自动初始化Git仓库**（如果当前目录不是Git项目）
+- ✅ **自动克隆.cursor规则配置项目**
+- ✅ **移除.cursor版本控制**（转交给你的项目管理）
+- ✅ **创建标准项目目录结构**（logs/、scripts/、docs/、backups/）
+- ✅ **生成交互式脚本管理入口**（`scripts.sh`）
+- ✅ **自动检测技术栈**（React、Node.js、Python等）
+- ✅ **更新.gitignore配置**
 
-4. **确认生效**
-   - 在 Cursor 中新建或编辑文件
-   - AI 助手会自动遵循项目规则进行代码建议和修改
+**🎯 真正的一键安装，无需任何前置条件！**
+
+**安装完成后重启 Cursor IDE 即可享受智能化开发体验！**
 
 ## 📁 规则文件结构
 
 ```
 .cursor/
 └── rules/
+    ├── setup-rules.sh          # 一键安装脚本 🔥
     ├── userrules.mdc           # 通用协作准则 (核心文件)
-    └── rule-file-management.mdc # 规则文件管理策略
+    ├── rule-file-management.mdc # 规则文件管理策略
+    └── README.md               # 详细使用说明 (本文件)
 ```
 
 ### 核心规则文件说明
@@ -167,28 +173,107 @@ your-project/
 - 🤝 清晰的代码审查标准
 - 🤝 可复用的项目经验积累
 
+## 🛠️ 安装脚本详细说明
+
+### `setup-rules.sh` 脚本功能
+
+我们提供了一个智能安装脚本，可以自动化完成所有配置工作：
+
+```bash
+bash .cursor/rules/setup-rules.sh
+```
+
+#### 🔍 脚本执行流程
+
+1. **环境检查阶段**
+   - 检查当前目录是否为Git仓库根目录
+   - 获取并显示当前项目信息（分支、远程、提交历史）
+   - 验证是否为.cursor项目本身（防止误操作）
+   - 确认.cursor目录和规则文件完整性
+
+2. **版本控制处理**
+   - 自动移除`.cursor/.git`目录
+   - 将.cursor配置的版本控制权转交给你的项目
+   - 更新`.gitignore`配置（默认提交.cursor到版本控制）
+
+3. **项目结构标准化**
+   - 创建标准目录：`logs/`、`scripts/`、`backups/`、`docs/`
+   - 为每个目录生成规范的README.md说明文件
+   - 按功能分类创建子目录（部署、工具、文档分类等）
+
+4. **脚本管理系统**
+   - 生成`scripts.sh`交互式脚本入口
+   - 支持命令行参数和交互式菜单两种使用方式
+   - 集成部署、工具、数据库、备份等常用脚本分类
+
+5. **技术栈智能识别**
+   - 自动检测项目技术栈（React、Vue、Node.js、Python等）
+   - 为后续Cursor AI生成专用规则文件提供信息
+   - 支持多技术栈项目的识别
+
+#### 🎯 安装后的项目结构
+
+```
+your-project/
+├── .cursor/                    # Cursor 规则配置（无.git）
+│   └── rules/
+│       ├── setup-rules.sh      # 一键安装脚本
+│       ├── userrules.mdc       # 通用协作准则
+│       ├── rule-file-management.mdc # 规则管理策略
+│       └── README.md           # 使用说明
+├── logs/                       # 项目日志目录
+├── scripts/                    # 脚本分类目录
+│   ├── deployment/             # 部署脚本
+│   ├── tools/                  # 工具脚本
+│   └── database/               # 数据库脚本
+├── scripts.sh                  # 交互式脚本入口
+├── backups/                    # 备份目录
+├── docs/                       # 文档分类目录
+│   ├── 架构文档/
+│   ├── 开发指南/
+│   ├── 部署运维/
+│   ├── API文档/
+│   ├── 用户手册/
+│   ├── 项目管理/
+│   ├── 问题解决/
+│   └── 团队协作/
+└── .gitignore                  # 更新的Git忽略配置
+```
+
 ## 📋 最佳实践建议
 
 ### 1. 项目启动阶段
 ```bash
-# 1. 拉取规则配置
-git clone https://github.com/lyfe2025/.cursor.git
+# 一键安装（无需Git环境，脚本会自动处理）
+bash <(curl -s https://raw.githubusercontent.com/lyfe2025/.cursor/main/rules/setup-rules.sh)
 
-# 2. 重启 Cursor IDE
-# 3. 让 AI 助手自动识别技术栈并生成专用规则
-# 4. 确认标准目录结构已创建
+# 然后重启 Cursor IDE，让 AI 助手自动识别技术栈并生成专用规则
 ```
 
-### 2. 开发过程中
+### 2. 脚本管理使用
+```bash
+# 交互式菜单（推荐新手）
+./scripts.sh
+
+# 快速系统检查
+./scripts.sh check
+
+# 查看帮助
+./scripts.sh help
+```
+
+### 3. 开发过程中
 - 遵循500行文件限制，及时进行代码分离
 - 利用自动生成的技术栈规则文件进行开发
 - 将重复遇到的问题反馈给 AI 助手生成规则文件
-- 保持项目文档和脚本的标准化组织
+- 使用`scripts.sh`管理项目相关脚本和工具
+- 按规范维护`docs/`目录下的项目文档
 
-### 3. 团队协作
+### 4. 团队协作
 - 确保所有团队成员都使用相同的规则配置
 - 定期更新规则文件内容，保持最佳实践的时效性
 - 将项目特有的规则和经验及时补充到专用规则文件中
+- 利用标准化的目录结构进行团队协作
 
 ## 🔄 更新和维护
 
@@ -203,11 +288,55 @@ git clone https://github.com/lyfe2025/.cursor.git
 2. 贡献代码改进规则文件内容
 3. 分享你的项目实践经验和最佳实践
 
+## ✅ 安装验证
+
+### 确认安装成功
+
+安装完成后，你可以通过以下方式验证配置是否生效：
+
+1. **检查目录结构**
+   ```bash
+   ls -la  # 确认看到 .cursor/, logs/, scripts/, docs/, backups/ 等目录
+   ```
+
+2. **验证脚本功能**
+   ```bash
+   ./scripts.sh check  # 运行系统检查
+   ```
+
+3. **重启 Cursor IDE**
+   - 重新打开你的项目
+   - 新建或编辑任意代码文件
+   - 观察 AI 助手是否遵循新的开发规则
+
+4. **查看规则文件**
+   ```bash
+   cat .cursor/rules/userrules.mdc  # 查看核心规则
+   ```
+
+### 常见问题排查
+
+**Q: Cursor AI 没有应用新规则？**
+- 确保重启了 Cursor IDE
+- 检查 `.cursor/rules/` 目录下是否有 `userrules.mdc` 文件
+- 尝试清除 Cursor 缓存并重启
+
+**Q: 脚本无法执行？**  
+```bash
+chmod +x scripts.sh  # 确保脚本有执行权限
+```
+
+**Q: 想要自定义规则文件？**
+- 可直接编辑 `.cursor/rules/userrules.mdc`
+- 添加项目特定的规则到文件末尾
+- Cursor AI 会自动应用修改后的规则
+
 ## 📞 支持和联系
 
 - **项目地址**：https://github.com/lyfe2025/.cursor
 - **问题反馈**：通过 GitHub Issues 提交
 - **使用讨论**：欢迎在 Issues 中分享使用经验
+- **安装脚本**：遇到安装问题可以查看 `setup.sh` 的详细日志输出
 
 ## 📄 许可证
 
@@ -216,3 +345,5 @@ git clone https://github.com/lyfe2025/.cursor.git
 ---
 
 **🚀 让每个新项目都从优秀的开发规范开始！**
+
+> 💡 **提示**：安装完成后不要忘记重启 Cursor IDE，让规则配置生效！
