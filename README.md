@@ -1,6 +1,8 @@
 # .cursor 项目规则配置
 
 > **为新项目提供标准化的 Cursor IDE 开发规则和最佳实践**
+> 
+> **当前版本：v2.2** - 智能化协作优化版
 
 ## 📖 项目简介
 
@@ -48,37 +50,37 @@ curl -fsSL https://raw.githubusercontent.com/lyfe2025/.cursor/main/rules/setup-r
 .cursor/
 └── rules/
     ├── setup-rules.sh                  # 一键安装脚本 🔥
-    ├── common-rules.mdc                # 🚀 极简核心运行时规则 (119行)
+    ├── common-rules.mdc                # 🚀 极简核心运行时规则 (191行)
     ├── detailed-guides.mdc             # 📖 详细指导文档 (511行, 按需引用)
-    ├── project-initialization.mdc     # 项目初始化专用规则 (一次性执行)
-    ├── collaboration-standards.mdc    # 协作交互规范 (专用文件)
-    ├── project-management-practices.mdc # 项目管理最佳实践 (专用文件)
-    └── rule-file-management.mdc       # 规则文件管理策略
+    ├── project-initialization.mdc     # 项目初始化专用规则 (179行)
+    ├── collaboration-standards.mdc    # 协作交互规范 (258行)
+    ├── project-management-practices.mdc # 项目管理最佳实践 (226行)
+    └── rule-file-management.mdc       # 规则文件管理策略 (186行)
 ```
 
 > 📝 **说明**：项目的详细使用说明文档（README.md）位于项目根目录，在安装到用户项目时会自动清理，避免影响用户项目的根目录结构。
 
-> 🚀 **v2.1 极致性能优化**：
-> - **极简核心规则**：`common-rules.mdc` 从508行精简至119行，减少76%的运行时处理量
-> - **智能分层加载**：核心规则(alwaysApply)仅119行，详细说明按需引用
-> - **条件化执行**：状态缓存、快速跳过、智能触发机制
-> - **响应速度提升**：AI处理速度提升约**85%**，接近即时响应
+> 🚀 **v2.2 智能化协作优化**：
+> - **智能状态检查**：`common-rules.mdc` 现为191行，包含完整的条件判断逻辑
+> - **专业化分工**：各规则文件职责更明确，协作规范258行、项目管理226行
+> - **条件化执行**：智能识别初始化场景、技术栈变更、状态验证需求
+> - **响应优化**：快速决策表、状态缓存机制提升交互效率
 
 ### 核心规则文件说明
 
-#### 🚀 `common-rules.mdc` - 极简核心运行时规则（119行）
-**v2.1 极致优化特性：**
-- ✅ **极简高效处理**：仅包含每次对话必需的核心规则，76%性能提升
-- ✅ **快速启动检查**：智能状态缓存，条件化初始化触发
-- ✅ **快速决策表**：立即执行/需确认/必须审查/禁止自主的快速判断
+#### 🚀 `common-rules.mdc` - 智能核心运行时规则（191行）
+**v2.2 智能化协作特性：**
+- ✅ **智能状态检查**：条件判断逻辑，精确识别初始化、更新、验证场景
+- ✅ **快速决策表**：立即执行/需确认/必须审查/禁止自主的智能判断
 - ✅ **专用规则引用**：按场景智能引用对应的专用规则文件
 - ✅ **500行铁律强制**：文件大小检查的绝对执行
+- ✅ **会话状态管理**：同会话继续优化，避免重复检查
 
-**极致性能优化：**
-- 状态缓存机制（避免重复检查）
+**智能化协作优化：**
+- 智能状态检查（条件判断逻辑，精确场景识别）
 - 条件加载策略（按需引用专用文件）
 - 快速决策表（秒级判断和响应）
-- 智能触发机制（最小化不必要的处理）
+- 会话状态管理（同会话继续优化）
 
 #### 📖 `detailed-guides.mdc` - 详细指导文档（511行，按需引用）
 **包含完整的配置指导：**
@@ -87,28 +89,28 @@ curl -fsSL https://raw.githubusercontent.com/lyfe2025/.cursor/main/rules/setup-r
 - ✅ **故障排除**：常见问题的详细解决方案
 - ✅ **最佳实践**：深度的开发和协作最佳实践
 
-#### 🚀 `project-initialization.mdc` - 项目初始化专用规则（180行，一次性执行）
+#### 🚀 `project-initialization.mdc` - 项目初始化专用规则（179行，一次性执行）
 **核心功能：**
 - ✅ **智能技术栈识别**：精确版本检测和规则文件生成
 - ✅ **项目结构标准化**：完整的目录体系和README生成
 - ✅ **环境一致性配置**：跨环境的配置标准化
 - ✅ **初始化状态管理**：完整性检查和标记机制
 
-#### 🤝 `collaboration-standards.mdc` - 协作交互规范（177行，专用文件）
+#### 🤝 `collaboration-standards.mdc` - 协作交互规范（258行，专用文件）
 **专用功能：**
 - ✅ **回复格式规范**：规则引用和沟通标准
 - ✅ **智能决策边界**：立即执行、需确认、必须审查的判断机制
 - ✅ **质量标准自适应**：根据环境和项目阶段调整要求
 - ✅ **用户体验优化**：错误处理和交互优化策略
 
-#### 📊 `project-management-practices.mdc` - 项目管理最佳实践（227行，专用文件）
+#### 📊 `project-management-practices.mdc` - 项目管理最佳实践（226行，专用文件）
 **管理体系：**
 - ✅ **环境一致性管理**：开发、测试、生产环境标准化
 - ✅ **监控与维护体系**：性能监控、日志管理、定期维护
 - ✅ **团队协作规范**：代码协作、知识管理、问题反馈
 - ✅ **持续改进机制**：质量保证和经验积累体系
 
-#### 🔧 `rule-file-management.mdc` - 规则管理策略
+#### 🔧 `rule-file-management.mdc` - 规则管理策略（186行，专用文件）
 **专用功能：**
 - 📊 智能规则文件生成触发机制
 - 🎯 问题分类和规则文件类型映射
@@ -220,7 +222,11 @@ your-project/
 我们提供了一个智能安装脚本，可以自动化完成所有配置工作：
 
 ```bash
+# 本地安装（如果已下载项目）
 bash .cursor/rules/setup-rules.sh
+
+# 一键远程安装（推荐）
+bash <(curl -s https://raw.githubusercontent.com/lyfe2025/.cursor/main/rules/setup-rules.sh)
 ```
 
 #### 🔍 脚本执行流程
@@ -263,9 +269,13 @@ bash .cursor/rules/setup-rules.sh
 your-project/
 ├── .cursor/                    # Cursor 规则配置（无.git，无README.md）
 │   └── rules/
-│       ├── setup-rules.sh      # 一键安装脚本
-│       ├── common-rules.mdc    # 通用协作准则
-│       └── rule-file-management.mdc # 规则文件管理策略
+│       ├── setup-rules.sh                  # 一键安装脚本
+│       ├── common-rules.mdc                # 智能核心运行时规则
+│       ├── detailed-guides.mdc             # 详细指导文档
+│       ├── project-initialization.mdc     # 项目初始化专用规则
+│       ├── collaboration-standards.mdc    # 协作交互规范
+│       ├── project-management-practices.mdc # 项目管理最佳实践
+│       └── rule-file-management.mdc       # 规则文件管理策略
 ├── logs/                       # 项目日志目录
 ├── scripts/                    # 脚本分类目录
 │   ├── deployment/             # 部署脚本
@@ -373,15 +383,24 @@ chmod +x scripts.sh  # 确保脚本有执行权限
 
 **Q: 想要自定义规则文件？**
 - 可直接编辑 `.cursor/rules/common-rules.mdc`
-- 添加项目特定的规则到文件末尾
+- 添加项目特定的规则到文件末尾  
+- 可编辑其他专用规则文件以满足特定需求
 - Cursor AI 会自动应用修改后的规则
+
+## 📊 项目统计
+
+- **规则文件总数**：6个专用规则文件 + 1个安装脚本
+- **规则文件总行数**：1,551行（不含安装脚本）
+- **核心运行时规则**：191行（common-rules.mdc）
+- **详细指导文档**：511行（detailed-guides.mdc）
+- **专用功能模块**：初始化179行、协作258行、管理226行、规则管理186行
 
 ## 📞 支持和联系
 
 - **项目地址**：https://github.com/lyfe2025/.cursor
 - **问题反馈**：通过 GitHub Issues 提交
 - **使用讨论**：欢迎在 Issues 中分享使用经验
-- **安装脚本**：遇到安装问题可以查看 `setup.sh` 的详细日志输出
+- **安装脚本**：遇到安装问题可以查看 `setup-rules.sh` 的详细日志输出
 
 ## 📄 许可证
 
