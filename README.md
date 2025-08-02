@@ -32,6 +32,7 @@ curl -fsSL https://raw.githubusercontent.com/lyfe2025/.cursor/main/rules/setup-r
 - ✅ **自动初始化Git仓库**（如果当前目录不是Git项目）
 - ✅ **自动克隆.cursor规则配置项目**
 - ✅ **移除.cursor版本控制**（转交给你的项目管理）
+- ✅ **智能清理项目README.md**（避免影响用户项目根目录）
 - ✅ **创建标准项目目录结构**（logs/、scripts/、docs/、backups/）
 - ✅ **生成交互式脚本管理入口**（`scripts.sh`）
 - ✅ **自动检测技术栈**（React、Node.js、Python等）
@@ -47,14 +48,15 @@ curl -fsSL https://raw.githubusercontent.com/lyfe2025/.cursor/main/rules/setup-r
 .cursor/
 └── rules/
     ├── setup-rules.sh          # 一键安装脚本 🔥
-    ├── userrules.mdc           # 通用协作准则 (核心文件)
-    ├── rule-file-management.mdc # 规则文件管理策略
-    └── README.md               # 详细使用说明 (本文件)
+    ├── common-rules.mdc        # 通用协作准则 (核心文件)
+    └── rule-file-management.mdc # 规则文件管理策略
 ```
+
+> 📝 **说明**：项目的详细使用说明文档（README.md）位于项目根目录，在安装到用户项目时会自动清理，避免影响用户项目的根目录结构。
 
 ### 核心规则文件说明
 
-#### 📋 `userrules.mdc` - 通用协作准则
+#### 📋 `common-rules.mdc` - 通用协作准则
 **主要功能：**
 - ✅ 500行文件强制限制（不可违背的铁律）
 - ✅ 智能技术栈识别和规则生成
@@ -193,6 +195,7 @@ bash .cursor/rules/setup-rules.sh
 
 2. **版本控制处理**
    - 自动移除`.cursor/.git`目录
+   - 智能清理项目README.md文件（通过内容特征识别，保护用户自己的README.md）
    - 将.cursor配置的版本控制权转交给你的项目
    - 更新`.gitignore`配置（默认提交.cursor到版本控制）
 
@@ -211,16 +214,20 @@ bash .cursor/rules/setup-rules.sh
    - 为后续Cursor AI生成专用规则文件提供信息
    - 支持多技术栈项目的识别
 
+6. **智能文件清理**
+   - 通过内容特征识别 .cursor 项目的 README.md 文件
+   - 自动清理避免与用户项目的 README.md 冲突
+   - 保护用户已有的项目文档不被误删
+
 #### 🎯 安装后的项目结构
 
 ```
 your-project/
-├── .cursor/                    # Cursor 规则配置（无.git）
+├── .cursor/                    # Cursor 规则配置（无.git，无README.md）
 │   └── rules/
 │       ├── setup-rules.sh      # 一键安装脚本
-│       ├── userrules.mdc       # 通用协作准则
-│       ├── rule-file-management.mdc # 规则管理策略
-│       └── README.md           # 使用说明
+│       ├── common-rules.mdc    # 通用协作准则
+│       └── rule-file-management.mdc # 规则文件管理策略
 ├── logs/                       # 项目日志目录
 ├── scripts/                    # 脚本分类目录
 │   ├── deployment/             # 部署脚本
@@ -311,14 +318,14 @@ bash <(curl -s https://raw.githubusercontent.com/lyfe2025/.cursor/main/rules/set
 
 4. **查看规则文件**
    ```bash
-   cat .cursor/rules/userrules.mdc  # 查看核心规则
+   cat .cursor/rules/common-rules.mdc  # 查看核心规则
    ```
 
 ### 常见问题排查
 
 **Q: Cursor AI 没有应用新规则？**
 - 确保重启了 Cursor IDE
-- 检查 `.cursor/rules/` 目录下是否有 `userrules.mdc` 文件
+- 检查 `.cursor/rules/` 目录下是否有 `common-rules.mdc` 文件
 - 尝试清除 Cursor 缓存并重启
 
 **Q: 脚本无法执行？**  
@@ -327,7 +334,7 @@ chmod +x scripts.sh  # 确保脚本有执行权限
 ```
 
 **Q: 想要自定义规则文件？**
-- 可直接编辑 `.cursor/rules/userrules.mdc`
+- 可直接编辑 `.cursor/rules/common-rules.mdc`
 - 添加项目特定的规则到文件末尾
 - Cursor AI 会自动应用修改后的规则
 

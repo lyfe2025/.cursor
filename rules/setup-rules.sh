@@ -154,7 +154,7 @@ clone_cursor_config() {
     
     if [ -d ".cursor" ]; then
         log_info ".cursor目录已存在，检查内容..."
-        if [ -f ".cursor/rules/userrules.mdc" ]; then
+        if [ -f ".cursor/rules/common-rules.mdc" ]; then
             log_success ".cursor配置已存在且完整"
             return 0
         else
@@ -174,7 +174,7 @@ clone_cursor_config() {
     fi
     
     # 验证关键文件
-    if [ ! -f ".cursor/rules/userrules.mdc" ]; then
+    if [ ! -f ".cursor/rules/common-rules.mdc" ]; then
         log_error ".cursor配置不完整，缺少关键文件"
         exit 1
     fi
@@ -225,8 +225,8 @@ verify_cursor_config() {
         exit 1
     fi
     
-    if [ ! -f ".cursor/rules/userrules.mdc" ]; then
-        log_error ".cursor/rules/userrules.mdc 文件不存在！"
+    if [ ! -f ".cursor/rules/common-rules.mdc" ]; then
+        log_error ".cursor/rules/common-rules.mdc 文件不存在！"
         exit 1
     fi
     
@@ -238,7 +238,7 @@ verify_cursor_config() {
     log_success ".cursor 配置验证通过"
 }
 
-# 移除.cursor目录中的git信息
+# 移除.cursor目录中的git信息和README.md文件
 remove_cursor_git() {
     log_step "处理 .cursor 目录的版本控制..."
     
@@ -248,6 +248,25 @@ remove_cursor_git() {
         log_success "已移除 .cursor/.git 目录"
     else
         log_info ".cursor/.git 目录不存在，跳过"
+    fi
+    
+    # 删除README.md文件，避免影响用户项目根目录
+    if [ -f "README.md" ] && [ -f ".cursor/rules/README.md" ]; then
+        # 检查是否是.cursor项目的README.md（通过内容特征判断）
+        if grep -q ".cursor 项目规则配置" README.md 2>/dev/null; then
+            log_info "移除 .cursor 项目的 README.md 文件（避免影响用户项目）"
+            rm -f "README.md"
+            log_success "已移除项目根目录的 README.md"
+        else
+            log_info "检测到用户自己的 README.md，保留不删除"
+        fi
+    elif [ -f "README.md" ]; then
+        # 只有根目录的README.md存在，检查是否为.cursor项目的
+        if grep -q ".cursor 项目规则配置" README.md 2>/dev/null; then
+            log_info "移除 .cursor 项目的 README.md 文件"
+            rm -f "README.md"
+            log_success "已移除项目根目录的 README.md"
+        fi
     fi
 }
 
@@ -742,6 +761,7 @@ show_completion() {
     
     echo -e "${CYAN}📋 安装摘要：${NC}"
     echo "  ✅ 移除了 .cursor 目录的版本控制"
+    echo "  ✅ 清理了 .cursor 项目的 README.md（避免影响用户项目）"
     echo "  ✅ 创建了标准项目目录结构" 
     echo "  ✅ 生成了 scripts.sh 交互式脚本入口"
     echo "  ✅ 检测了项目技术栈"
@@ -761,9 +781,9 @@ show_completion() {
     echo ""
     
     echo -e "${PURPLE}📚 规则文件位置：${NC}"
-    echo "  • 通用规则: ${GREEN}.cursor/rules/userrules.mdc${NC}"
+    echo "  • 通用规则: ${GREEN}.cursor/rules/common-rules.mdc${NC}"
     echo "  • 管理策略: ${GREEN}.cursor/rules/rule-file-management.mdc${NC}"
-    echo "  • 文档说明: ${GREEN}.cursor/rules/README.md${NC}"
+    echo "  • 项目文档: ${GREEN}README.md${NC} (项目根目录)"
     echo ""
     
     print_separator
