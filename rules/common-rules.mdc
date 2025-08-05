@@ -10,10 +10,81 @@ alwaysApply: true
 
 ## 🚀 快速启动检查
 
+### ⚡ 专用规则文件优先检查机制（强制执行）
+
+```javascript
+// **强制执行**: 任何操作前必须优先检查专用规则文件
+function MANDATORY_SPECIALIZED_RULES_CHECK() {
+  // 步骤1: 强制扫描已存在的专用规则文件
+  const existingRules = scanDirectory('.cursor/rules/');
+  const specializedFiles = existingRules.filter(file => 
+    !['common-rules.mdc', 'collaboration-standards.mdc', 
+      'project-management-practices.mdc', 'rule-file-management.mdc',
+      'project-initialization.mdc', 'detailed-guides.mdc'].includes(file)
+  );
+  
+  // 步骤2: 按优先级排序并强制应用
+  const prioritizedRules = sortByPriority(specializedFiles);
+  for (const ruleFile of prioritizedRules) {
+    FORCE_LOAD_AND_APPLY(ruleFile); // 强制加载，无条件应用
+  }
+  
+  // 步骤3: 技术栈检测与专用规则生成
+  const techStack = detectTechStack();
+  for (const tech of techStack) {
+    const expectedRuleFile = `${tech.name}-v${tech.version}-standards.mdc`;
+    if (!exists(expectedRuleFile)) {
+      IMMEDIATE_GENERATE_RULE_FILE(expectedRuleFile);
+      FORCE_LOAD_AND_APPLY(expectedRuleFile); // 生成后立即应用
+    }
+  }
+  
+  // 步骤4: 问题域专用规则检查
+  const activeProblems = analyzeCurrentContext();
+  for (const problem of activeProblems) {
+    const solutionFile = `${problem.type}-solutions.mdc`;
+    if (exists(solutionFile)) {
+      FORCE_LOAD_AND_APPLY(solutionFile);
+    }
+  }
+  
+  return SPECIALIZED_RULES_LOADED;
+}
+```
+
+### 🎯 专用规则文件执行路径（清晰优先级）
+
+```mermaid
+flowchart TD
+    A[任何AI操作] --> B{专用规则文件检查}
+    B --> C[扫描.cursor/rules/目录]
+    C --> D[识别所有专用规则文件]
+    D --> E[按优先级排序]
+    E --> F[逐个强制加载应用]
+    F --> G{技术栈规则存在?}
+    G -->|否| H[立即生成技术栈规则]
+    G -->|是| I[验证规则版本匹配]
+    H --> J[强制应用新生成规则]
+    I --> K{问题域规则存在?}
+    J --> K
+    K -->|是| L[应用问题域规则]
+    K -->|否| M[检查是否需要生成]
+    L --> N[执行主要操作]
+    M --> N
+    
+    style B fill:#ff6b6b
+    style F fill:#ff6b6b
+    style H fill:#ff6b6b
+    style J fill:#ff6b6b
+```
+
 ### 状态检查（智能条件判断）
 ```javascript
 // 精确条件判断逻辑 - AI请严格按此逻辑执行
 function intelligentStatusCheck() {
+  // **第0步: 强制专用规则文件检查** - 任何操作前的必要步骤
+  MANDATORY_SPECIALIZED_RULES_CHECK(); // 强制执行，无条件跳过
+  
   // 条件1: 强制初始化场景
   if (!exists('.cursor/project-initialized') || 
       user_explicitly_requests_init ||
@@ -62,25 +133,48 @@ function intelligentStatusCheck() {
 | **必须审查** | 核心业务 | 业务逻辑、数据库变更、权限设置 | 详细说明+强制用户审查 |
 | **禁止自主** | 高风险操作 | 生产部署、数据删除、破坏性重构 | 绝不自主执行 |
 
-### 3. 专用规则文件引用（智能加载逻辑）
+### 3. 专用规则文件优先加载机制（强制执行路径）
 
+#### 🔥 **强制优先级** - 无条件检查和应用
+| 优先级 | 规则文件类型 | 强制执行条件 | 生成时机 | 应用方式 |
+|--------|-------------|-------------|----------|----------|
+| **P0 - 技术栈专用** | `<tech-stack>-v<version>-standards.mdc` | 检测到对应技术栈 | 立即生成（如不存在） | 强制加载，无条件应用 |
+| **P1 - 问题域专用** | `<problem-type>-solutions.mdc` | 存在相关问题上下文 | 问题重复出现时 | 强制加载，优先应用 |
+| **P2 - 安全合规** | `security-<type>-requirements.mdc` | 涉及安全相关操作 | 安全需求识别时 | 强制加载，严格执行 |
+| **P3 - 功能域专用** | `<domain>-<feature>-standards.mdc` | 特定功能域操作 | 功能复杂化时 | 按需加载，智能应用 |
+
+#### 📋 **条件优先级** - 智能判断加载
 | 场景类型 | 规则文件 | 精确加载条件 | 跳过条件 | 优先级 |
 |----------|----------|-------------|----------|--------|
 | **协作交互** | collaboration-standards.mdc | 需要格式化回复 OR 涉及决策边界判断 | 纯技术问题且无格式要求 | 高 |
 | **项目管理** | project-management-practices.mdc | 提及"环境"/"团队"/"部署"/"监控" | 单纯代码修改任务 | 中 |
 | **规则管理** | rule-file-management.mdc | 用户要求生成规则 OR 同问题出现≥2次 | 首次遇到的新问题 | 中 |
 | **初始化流程** | project-initialization.mdc | 无`.cursor/project-initialized` OR 用户明确要求 | 已初始化且无技术栈变更 | 最高 |
-| **技术栈专用** | `<tech-stack>-v<version>-standards.mdc` | 代码涉及特定技术栈操作 | 通用规则即可解决 | 高 |
 
 ```javascript
-// 智能加载判断函数
+// 强制专用规则文件优先检查函数
 function shouldLoadRuleFile(fileType, context) {
-  // 快速跳过逻辑
-  if (context.is_simple_bug_fix && !context.requires_formatting) {
-    return SKIP_MOST_RULES();
+  // **第一步: 强制检查专用规则文件** - 无条件执行
+  const specializedRules = checkSpecializedRules(context);
+  if (specializedRules.length > 0) {
+    for (const rule of specializedRules) {
+      FORCE_LOAD_AND_APPLY(rule); // 强制应用所有专用规则
+    }
   }
   
-  // 条件加载逻辑
+  // **第二步: 检查是否需要生成新的专用规则文件**
+  const missingTechStackRules = detectMissingTechStackRules(context);
+  for (const missing of missingTechStackRules) {
+    IMMEDIATE_GENERATE_AND_APPLY(missing); // 立即生成并应用
+  }
+  
+  // **第三步: 快速跳过逻辑**（仅在专用规则检查完成后）
+  if (context.is_simple_bug_fix && !context.requires_formatting && 
+      specializedRules.length === 0) {
+    return SKIP_CONDITIONAL_RULES();
+  }
+  
+  // **第四步: 条件加载逻辑**（补充性检查）
   switch(fileType) {
     case 'collaboration':
       return context.needs_reply_format || context.needs_decision_boundary;
@@ -91,6 +185,34 @@ function shouldLoadRuleFile(fileType, context) {
     default:
       return true; // 默认加载
   }
+}
+
+// 专用规则文件检查辅助函数
+function checkSpecializedRules(context) {
+  const rules = [];
+  
+  // P0: 技术栈专用规则（最高优先级）
+  const techStack = detectTechStack();
+  for (const tech of techStack) {
+    const ruleFile = `${tech.name}-v${tech.version}-standards.mdc`;
+    if (exists(ruleFile)) rules.push({file: ruleFile, priority: 0});
+  }
+  
+  // P1: 问题域专用规则
+  const problemDomain = analyzeProblemDomain(context);
+  if (problemDomain) {
+    const solutionFile = `${problemDomain}-solutions.mdc`;
+    if (exists(solutionFile)) rules.push({file: solutionFile, priority: 1});
+  }
+  
+  // P2: 安全合规规则
+  if (context.involves_security) {
+    const securityRules = scanSecurityRules();
+    rules.push(...securityRules.map(file => ({file, priority: 2})));
+  }
+  
+  // 按优先级排序返回
+  return rules.sort((a, b) => a.priority - b.priority);
 }
 ```
 
@@ -110,17 +232,35 @@ function shouldLoadRuleFile(fileType, context) {
 
 ## 🎯 快速引用表
 
-### 常见场景 → 规则文件映射 + 引用跟踪
+### 🎯 专用规则文件优先引用路径 + 强制跟踪
 
+#### **Phase 1: 强制专用规则检查**（每次操作前必须执行）
+| 检查步骤 | 规则文件类型 | 检查方式 | 显示格式 | 强制性 |
+|----------|-------------|----------|----------|--------|
+| **1️⃣ 技术栈专用** | `<tech>-v<ver>-standards.mdc` | 自动扫描+强制应用 | `🔧 [技术栈] v[版本] → [强制应用]` | 💯 强制 |
+| **2️⃣ 问题域专用** | `<problem>-solutions.mdc` | 上下文匹配+优先应用 | `🛠️ [问题域] → [专用解决方案]` | 💯 强制 |
+| **3️⃣ 安全合规** | `security-<type>-requirements.mdc` | 安全检测+严格执行 | `🔒 [安全域] → [合规要求]` | 💯 强制 |
+| **4️⃣ 功能域专用** | `<domain>-<feature>-standards.mdc` | 功能检测+智能应用 | `⚙️ [功能域] → [专用标准]` | ⚡ 智能 |
+
+#### **Phase 2: 条件规则补充**（专用规则应用后的补充检查）
 | 场景 | 引用文件 | 加载时机 | 必须在回复中显示 |
 |------|----------|----------|-----------------|
 | **首次协作** | project-initialization.mdc | 检测到未初始化 | `🚀 项目初始化 → [执行阶段]` |
 | **协作交互** | collaboration-standards.mdc | 需要格式化回复时 | `🤝 协作规范 → [格式化应用]` |
 | **项目管理** | project-management-practices.mdc | 涉及环境/团队问题 | `📊 项目管理 → [具体场景]` |
-| **技术栈问题** | tech-stack专用规则 | 检测到对应技术栈 | `🔧 [技术栈名] → [版本+操作]` |
 | **规则管理** | rule-file-management.mdc | 需要生成新规则时 | `⚙️ 规则管理 → [生成/修改]` |
 
-> 📋 **强制要求**: AI每次回复都必须按照 `collaboration-standards.mdc` 的引用跟踪格式显示使用的具体规则
+#### **自动生成机制**（缺失专用规则时的立即生成）
+| 触发条件 | 生成规则文件 | 生成时机 | 应用方式 |
+|----------|-------------|----------|----------|
+| **技术栈无对应规则** | `<tech>-v<ver>-standards.mdc` | 检测到技术栈但无规则文件 | 立即生成+强制应用 |
+| **重复问题≥2次** | `<problem-type>-solutions.mdc` | 同类问题反复出现 | 记录问题+生成解决方案 |
+| **新功能域复杂化** | `<domain>-standards.mdc` | 功能复杂度超过阈值 | 提示生成+用户确认 |
+
+> 💥 **强制执行要求**: 
+> 1. AI每次操作前必须执行 Phase 1 的专用规则检查
+> 2. 每次回复必须显示所有应用的专用规则文件
+> 3. 缺失的专用规则文件必须立即生成并应用
 
 ### 质量标准快速判断
 
