@@ -1,0 +1,459 @@
+---
+alwaysApply: false
+conditions:
+  - involves_code_changes
+  - involves_refactoring
+  - code_quality_review
+  - duplicate_code_detected
+---
+# 代码质量 - DRY 原则专用规则
+
+> **专用规则文件** - 从 `common-rules.mdc` 分离出来的 DRY 原则详细实施指南
+> **自动触发条件**: 代码变更、重构需求、质量审查、重复代码检测
+
+---
+
+## 🔍 **DRY 原则强制执行机制**
+
+### 重复检测与强制消除
+
+| 重复类型 | 检测方式 | 强制执行阈值 | 重构策略 | 执行时机 |
+|----------|----------|-------------|----------|----------|
+| **代码重复** | 相同逻辑片段≥2次 | 立即重构 | 提取函数/方法 | 编写代码时强制检查 |
+| **配置重复** | 相同配置在多处定义 | 立即统一 | 配置文件集中化 | 配置修改时强制检查 |
+| **文档重复** | 相同说明在多处出现 | ≥3处重复时 | 单一信息源+引用 | 文档更新时检查 |
+| **规则重复** | 相同规则在多个文件 | 立即合并 | 提取到通用规则文件 | 规则创建时强制检查 |
+| **测试重复** | 相同测试逻辑重复 | ≥2次重复时 | 测试工具函数提取 | 测试编写时检查 |
+
+### DRY 执行检查清单
+
+```javascript
+// DRY 原则强制检查算法
+function MANDATORY_DRY_CHECK(codeChange) {
+  // 第1步: 代码重复检测（强制执行）
+  const duplicatedCode = detectCodeDuplication(codeChange);
+  if (duplicatedCode.length > 0) {
+    FORCE_REFACTOR_IMMEDIATELY(duplicatedCode);
+    return BLOCK_UNTIL_DRY_COMPLIANT();
+  }
+  
+  // 第2步: 配置重复检测
+  const duplicatedConfig = detectConfigDuplication(codeChange);
+  if (duplicatedConfig.length > 0) {
+    IMMEDIATE_CONFIG_CONSOLIDATION(duplicatedConfig);
+  }
+  
+  // 第3步: 规则重复检测
+  if (codeChange.involves_new_rules) {
+    const ruleConflicts = detectRuleDuplication(codeChange);
+    if (ruleConflicts.length > 0) {
+      MERGE_DUPLICATE_RULES(ruleConflicts);
+    }
+  }
+  
+  // 第4步: 文档重复检测
+  const duplicatedDocs = detectDocumentationDuplication(codeChange);
+  if (duplicatedDocs.count >= 3) {
+    CREATE_SINGLE_SOURCE_OF_TRUTH(duplicatedDocs);
+  }
+  
+  return DRY_COMPLIANCE_VERIFIED();
+}
+```
+
+---
+
+## ⚡ **智能重构策略**
+
+### 重复模式识别与处理
+
+| 重复模式 | 检测触发器 | 重构方法 | 代码示例 |
+|----------|------------|----------|----------|
+| **函数逻辑重复** | 相同代码块≥10行 | 提取通用函数 | `extractCommonFunction(duplicatedLogic)` |
+| **条件判断重复** | 相同if/switch≥3处 | 策略模式/映射表 | `const strategies = {type1: handler1, type2: handler2}` |
+| **数据处理重复** | 相同转换逻辑≥2处 | 工具函数/管道模式 | `pipe(transform1, transform2, transform3)(data)` |
+| **验证逻辑重复** | 相同校验规则≥2处 | 验证器模式 | `validator.addRule().check(data)` |
+| **错误处理重复** | 相同异常处理≥3处 | 统一错误处理器 | `errorHandler.handle(error, context)` |
+
+### 自动化重构工具链
+
+```javascript
+// 智能重构决策引擎
+class DRYRefactoringEngine {
+  static analyzeAndRefactor(codebase) {
+    const duplications = this.detectAllDuplications(codebase);
+    const refactoringPlan = this.createRefactoringPlan(duplications);
+    
+    return this.executeRefactoring(refactoringPlan);
+  }
+  
+  static detectAllDuplications(codebase) {
+    return {
+      functions: this.detectFunctionDuplication(codebase),
+      conditions: this.detectConditionalDuplication(codebase),
+      dataProcessing: this.detectDataProcessingDuplication(codebase),
+      errorHandling: this.detectErrorHandlingDuplication(codebase),
+      configurations: this.detectConfigurationDuplication(codebase)
+    };
+  }
+  
+  static createRefactoringPlan(duplications) {
+    const plan = [];
+    
+    // 按严重性排序处理
+    duplications.functions
+      .filter(d => d.severity === 'critical')
+      .forEach(d => plan.push(this.createFunctionExtractionPlan(d)));
+      
+    duplications.conditions
+      .filter(d => d.occurrences >= 3)
+      .forEach(d => plan.push(this.createStrategyPatternPlan(d)));
+      
+    return plan.sort((a, b) => b.priority - a.priority);
+  }
+}
+```
+
+---
+
+## 🎯 **DRY 合规性等级与执行策略**
+
+### 合规性分级标准
+
+| 合规等级 | 重复度指标 | 强制执行动作 | 允许例外情况 | 处理时限 |
+|----------|------------|-------------|-------------|----------|
+| **🔴 严重违规** | 重复代码>50行 | 立即停止开发，强制重构 | 无例外 | 立即 |
+| **🟡 中度违规** | 重复代码10-50行 | 当前任务完成前必须重构 | 紧急Bug修复 | 24小时内 |
+| **🟢 轻微违规** | 重复代码<10行 | 下次迭代时优化 | 原型开发阶段 | 下个迭代 |
+| **✅ 完全合规** | 无显著重复 | 继续开发 | - | - |
+
+### 环境适应性策略
+
+```javascript
+// 环境适应性 DRY 执行策略
+function getEnvironmentDRYStrategy(environment, context) {
+  const strategies = {
+    production: {
+      tolerance: 'zero',
+      action: 'FORCE_IMMEDIATE_REFACTOR',
+      exceptions: []
+    },
+    
+    development: {
+      tolerance: 'low',
+      action: 'REQUIRE_REFACTOR_BEFORE_MERGE',
+      exceptions: ['hotfix', 'urgent_bugfix']
+    },
+    
+    prototype: {
+      tolerance: 'moderate',
+      action: 'MARK_TECHNICAL_DEBT',
+      exceptions: ['proof_of_concept', 'initial_validation']
+    },
+    
+    testing: {
+      tolerance: 'low',
+      action: 'REQUIRE_REFACTOR_BEFORE_DEPLOY',
+      exceptions: []
+    }
+  };
+  
+  return strategies[environment] || strategies.development;
+}
+```
+
+---
+
+## 🛠️ **实战重构示例**
+
+### 示例1: 验证逻辑重复重构
+
+```javascript
+// ❌ 违反DRY - 重复的验证逻辑
+function validateUser(user) {
+  if (!user.name) throw new Error('Name required');
+  if (!user.email) throw new Error('Email required');
+  if (!user.age || user.age < 0) throw new Error('Valid age required');
+}
+
+function validateAdmin(admin) {
+  if (!admin.name) throw new Error('Name required');
+  if (!admin.email) throw new Error('Email required');
+  if (!admin.permissions) throw new Error('Permissions required');
+}
+
+function validateGuest(guest) {
+  if (!guest.name) throw new Error('Name required');
+  if (!guest.sessionId) throw new Error('Session ID required');
+}
+
+// ✅ 遵循DRY - 统一验证器
+class Validator {
+  static rules = {
+    name: (val) => val ? null : 'Name required',
+    email: (val) => val ? null : 'Email required',
+    age: (val) => (val && val >= 0) ? null : 'Valid age required',
+    permissions: (val) => val ? null : 'Permissions required',
+    sessionId: (val) => val ? null : 'Session ID required'
+  };
+  
+  static validate(obj, requiredFields) {
+    for (const field of requiredFields) {
+      const error = this.rules[field]?.(obj[field]);
+      if (error) throw new Error(error);
+    }
+  }
+  
+  static addRule(field, rule) {
+    this.rules[field] = rule;
+    return this;
+  }
+}
+
+// 使用统一验证器
+const validateUser = (user) => Validator.validate(user, ['name', 'email', 'age']);
+const validateAdmin = (admin) => Validator.validate(admin, ['name', 'email', 'permissions']);
+const validateGuest = (guest) => Validator.validate(guest, ['name', 'sessionId']);
+```
+
+### 示例2: 数据处理重复重构
+
+```javascript
+// ❌ 违反DRY - 重复的数据转换
+function processUserData(userData) {
+  const cleaned = userData.filter(u => u != null);
+  const normalized = cleaned.map(u => ({
+    ...u,
+    name: u.name.trim().toLowerCase(),
+    email: u.email.trim().toLowerCase()
+  }));
+  const validated = normalized.filter(u => u.email.includes('@'));
+  return validated;
+}
+
+function processAdminData(adminData) {
+  const cleaned = adminData.filter(a => a != null);
+  const normalized = cleaned.map(a => ({
+    ...a,
+    name: a.name.trim().toLowerCase(),
+    email: a.email.trim().toLowerCase()
+  }));
+  const validated = normalized.filter(a => a.email.includes('@') && a.permissions);
+  return validated;
+}
+
+// ✅ 遵循DRY - 管道式数据处理
+class DataProcessor {
+  static pipe(...operations) {
+    return (data) => operations.reduce((result, operation) => operation(result), data);
+  }
+  
+  static cleanNullValues = (data) => data.filter(item => item != null);
+  
+  static normalizeFields = (fields) => (data) => 
+    data.map(item => ({
+      ...item,
+      ...fields.reduce((acc, field) => ({
+        ...acc,
+        [field]: item[field]?.trim().toLowerCase()
+      }), {})
+    }));
+  
+  static validateEmail = (data) => data.filter(item => item.email?.includes('@'));
+  
+  static validatePermissions = (data) => data.filter(item => item.permissions);
+}
+
+// 使用管道式处理
+const processUserData = DataProcessor.pipe(
+  DataProcessor.cleanNullValues,
+  DataProcessor.normalizeFields(['name', 'email']),
+  DataProcessor.validateEmail
+);
+
+const processAdminData = DataProcessor.pipe(
+  DataProcessor.cleanNullValues,
+  DataProcessor.normalizeFields(['name', 'email']),
+  DataProcessor.validateEmail,
+  DataProcessor.validatePermissions
+);
+```
+
+---
+
+## 💡 **DRY 原则的智能应用边界**
+
+### 场景化应用策略
+
+| 场景类型 | DRY 应用程度 | 权衡考虑 | 最佳实践 | 风险管控 |
+|----------|-------------|----------|----------|----------|
+| **业务逻辑** | 严格应用 | 避免耦合不相关领域 | 按业务边界提取 | 保持业务独立性 |
+| **工具函数** | 完全应用 | 提升复用性 | 统一工具库 | 版本兼容性管理 |
+| **配置管理** | 严格应用 | 单一配置源 | 环境变量+配置文件 | 配置变更影响分析 |
+| **测试代码** | 适度应用 | 保持测试独立性 | 共享测试工具，独立测试数据 | 测试隔离性保证 |
+| **原型开发** | 宽松应用 | 快速验证优先 | 标记技术债务，后续重构 | 债务追踪和清理 |
+
+### 反模式识别与预防
+
+```javascript
+// DRY 反模式检测器
+class AntiPatternDetector {
+  static detectOverAbstraction(codebase) {
+    // 检测过度抽象：为了消除少量重复而创建过于复杂的抽象
+    return codebase.abstractions.filter(abs => 
+      abs.complexity > abs.duplication_saved * 2
+    );
+  }
+  
+  static detectPrematureDRY(codebase) {
+    // 检测过早DRY：在模式尚未稳定前就进行抽取
+    return codebase.extractions.filter(ext => 
+      ext.usage_count < 3 && ext.variation_count > 1
+    );
+  }
+  
+  static detectWrongAbstractionLevel(codebase) {
+    // 检测错误的抽象层级：不同职责的代码被错误地抽取在一起
+    return codebase.functions.filter(func => 
+      func.responsibilities.length > 1
+    );
+  }
+}
+```
+
+---
+
+## 📊 **DRY 合规性监控与报告**
+
+### 自动化监控机制
+
+```javascript
+// DRY 合规性监控系统
+class DRYComplianceMonitor {
+  static generateComplianceReport(codebase) {
+    const report = {
+      timestamp: new Date().toISOString(),
+      overall_score: 0,
+      violations: [],
+      improvements: [],
+      recommendations: []
+    };
+    
+    // 计算整体DRY得分
+    const duplications = this.analyzeCodebase(codebase);
+    report.overall_score = this.calculateDRYScore(duplications);
+    
+    // 识别违规项
+    report.violations = this.identifyViolations(duplications);
+    
+    // 提供改进建议
+    report.improvements = this.suggestImprovements(duplications);
+    
+    // 生成具体建议
+    report.recommendations = this.generateRecommendations(report);
+    
+    return report;
+  }
+  
+  static calculateDRYScore(duplications) {
+    const totalLines = duplications.total_lines;
+    const duplicatedLines = duplications.duplicated_lines;
+    return Math.max(0, 100 - (duplicatedLines / totalLines * 100));
+  }
+  
+  static identifyViolations(duplications) {
+    return duplications.instances
+      .filter(d => d.severity !== 'minor')
+      .map(d => ({
+        type: d.type,
+        locations: d.locations,
+        severity: d.severity,
+        suggested_action: this.getSuggestedAction(d)
+      }));
+  }
+}
+```
+
+### 持续改进机制
+
+```javascript
+// DRY 持续改进引擎
+class DRYImprovementEngine {
+  static createImprovementPlan(complianceReport) {
+    const plan = {
+      immediate_actions: [],
+      short_term_goals: [],
+      long_term_strategy: []
+    };
+    
+    // 立即行动项
+    complianceReport.violations
+      .filter(v => v.severity === 'critical')
+      .forEach(v => plan.immediate_actions.push({
+        action: 'REFACTOR_IMMEDIATELY',
+        target: v.locations,
+        deadline: 'immediate'
+      }));
+    
+    // 短期目标
+    complianceReport.violations
+      .filter(v => v.severity === 'moderate')
+      .forEach(v => plan.short_term_goals.push({
+        action: 'SCHEDULE_REFACTORING',
+        target: v.locations,
+        deadline: 'next_sprint'
+      }));
+    
+    // 长期策略
+    plan.long_term_strategy = this.developLongTermStrategy(complianceReport);
+    
+    return plan;
+  }
+  
+  static trackProgress(previousReport, currentReport) {
+    return {
+      score_improvement: currentReport.overall_score - previousReport.overall_score,
+      violations_resolved: previousReport.violations.length - currentReport.violations.length,
+      new_violations: this.identifyNewViolations(previousReport, currentReport),
+      improvement_velocity: this.calculateImprovementVelocity(previousReport, currentReport)
+    };
+  }
+}
+```
+
+---
+
+## 📚 **使用指南**
+
+### 何时引用本规则文件
+
+**自动触发条件：**
+- 代码变更提交前
+- 重构任务启动时
+- 代码审查过程中
+- 质量门禁检查时
+- 技术债务评估时
+
+**手动触发场景：**
+- 用户明确要求DRY检查
+- 项目质量改进计划
+- 代码库优化项目
+- 团队培训和规范制定
+
+### 与主规则文件的配合
+
+在 `common-rules.mdc` 中通过简洁的引用方式调用本文件：
+- 检测到代码重复时自动加载
+- 重构需求时优先应用
+- 质量审查阶段强制执行
+
+### 集成到开发工作流
+
+1. **IDE集成**: 实时DRY检查和提示
+2. **CI/CD流水线**: 自动化DRY合规性检查
+3. **代码审查**: DRY违规自动标记
+4. **技术债务管理**: DRY债务跟踪和优先级排序
+
+---
+
+**注意**: 本专用规则文件专注于DRY原则的详细实施，与 `common-rules.mdc` 形成互补，确保代码质量的系统性管理。

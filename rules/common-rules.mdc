@@ -133,15 +133,44 @@ function intelligentStatusCheck() {
 | **必须审查** | 核心业务 | 业务逻辑、数据库变更、权限设置 | 详细说明+强制用户审查 |
 | **禁止自主** | 高风险操作 | 生产部署、数据删除、破坏性重构 | 绝不自主执行 |
 
-### 3. 专用规则文件优先加载机制（强制执行路径）
+### 3. DRY 原则强制执行机制（Don't Repeat Yourself）
+
+#### 🔍 **重复检测触发** → 自动加载 `code-quality-dry-standards.mdc`
+
+| 触发条件 | 检测阈值 | 执行动作 | 专用规则应用 |
+|----------|----------|----------|-------------|
+| **代码重复** | ≥2次相同逻辑 | 立即重构 | `🛠️ DRY专用规则 → [强制应用]` |
+| **配置重复** | 多处相同配置 | 立即统一 | `🛠️ DRY专用规则 → [配置整合]` |
+| **文档重复** | ≥3处相同说明 | 单一信息源 | `🛠️ DRY专用规则 → [文档优化]` |
+| **规则重复** | 多文件相同规则 | 立即合并 | `🛠️ DRY专用规则 → [规则整合]` |
+
+```javascript
+// DRY 原则检查 - 自动触发专用规则文件
+function DRY_PRINCIPLE_CHECK(codeChange) {
+  const duplicationDetected = detectCodeDuplication(codeChange);
+  
+  if (duplicationDetected.length > 0) {
+    // 自动加载专用DRY规则文件
+    FORCE_LOAD_SPECIALIZED_RULE('code-quality-dry-standards.mdc');
+    return APPLY_DETAILED_DRY_STANDARDS(duplicationDetected);
+  }
+  
+  return DRY_COMPLIANT();
+}
+```
+
+> 💡 **详细DRY实施指南**: 检测到代码重复时自动引用 `code-quality-dry-standards.mdc` 获取完整的重构策略、合规性标准和实战示例
+
+### 4. 专用规则文件优先加载机制（强制执行路径）
 
 #### 🔥 **强制优先级** - 无条件检查和应用
 | 优先级 | 规则文件类型 | 强制执行条件 | 生成时机 | 应用方式 |
 |--------|-------------|-------------|----------|----------|
 | **P0 - 技术栈专用** | `<tech-stack>-v<version>-standards.mdc` | 检测到对应技术栈 | 立即生成（如不存在） | 强制加载，无条件应用 |
-| **P1 - 问题域专用** | `<problem-type>-solutions.mdc` | 存在相关问题上下文 | 问题重复出现时 | 强制加载，优先应用 |
-| **P2 - 安全合规** | `security-<type>-requirements.mdc` | 涉及安全相关操作 | 安全需求识别时 | 强制加载，严格执行 |
-| **P3 - 功能域专用** | `<domain>-<feature>-standards.mdc` | 特定功能域操作 | 功能复杂化时 | 按需加载，智能应用 |
+| **P1 - 代码质量专用** | `code-quality-dry-standards.mdc` | 检测到代码重复 | 已存在，立即应用 | 强制加载，DRY标准执行 |
+| **P2 - 问题域专用** | `<problem-type>-solutions.mdc` | 存在相关问题上下文 | 问题重复出现时 | 强制加载，优先应用 |
+| **P3 - 安全合规** | `security-<type>-requirements.mdc` | 涉及安全相关操作 | 安全需求识别时 | 强制加载，严格执行 |
+| **P4 - 功能域专用** | `<domain>-<feature>-standards.mdc` | 特定功能域操作 | 功能复杂化时 | 按需加载，智能应用 |
 
 #### 📋 **条件优先级** - 智能判断加载
 | 场景类型 | 规则文件 | 精确加载条件 | 跳过条件 | 优先级 |
@@ -238,9 +267,10 @@ function checkSpecializedRules(context) {
 | 检查步骤 | 规则文件类型 | 检查方式 | 显示格式 | 强制性 |
 |----------|-------------|----------|----------|--------|
 | **1️⃣ 技术栈专用** | `<tech>-v<ver>-standards.mdc` | 自动扫描+强制应用 | `🔧 [技术栈] v[版本] → [强制应用]` | 💯 强制 |
-| **2️⃣ 问题域专用** | `<problem>-solutions.mdc` | 上下文匹配+优先应用 | `🛠️ [问题域] → [专用解决方案]` | 💯 强制 |
-| **3️⃣ 安全合规** | `security-<type>-requirements.mdc` | 安全检测+严格执行 | `🔒 [安全域] → [合规要求]` | 💯 强制 |
-| **4️⃣ 功能域专用** | `<domain>-<feature>-standards.mdc` | 功能检测+智能应用 | `⚙️ [功能域] → [专用标准]` | ⚡ 智能 |
+| **2️⃣ 代码质量DRY** | `code-quality-dry-standards.mdc` | 重复检测+强制应用 | `🛠️ DRY原则 → [重复消除]` | 💯 强制 |
+| **3️⃣ 问题域专用** | `<problem>-solutions.mdc` | 上下文匹配+优先应用 | `🛠️ [问题域] → [专用解决方案]` | 💯 强制 |
+| **4️⃣ 安全合规** | `security-<type>-requirements.mdc` | 安全检测+严格执行 | `🔒 [安全域] → [合规要求]` | 💯 强制 |
+| **5️⃣ 功能域专用** | `<domain>-<feature>-standards.mdc` | 功能检测+智能应用 | `⚙️ [功能域] → [专用标准]` | ⚡ 智能 |
 
 #### **Phase 2: 条件规则补充**（专用规则应用后的补充检查）
 | 场景 | 引用文件 | 加载时机 | 必须在回复中显示 |
@@ -254,6 +284,7 @@ function checkSpecializedRules(context) {
 | 触发条件 | 生成规则文件 | 生成时机 | 应用方式 |
 |----------|-------------|----------|----------|
 | **技术栈无对应规则** | `<tech>-v<ver>-standards.mdc` | 检测到技术栈但无规则文件 | 立即生成+强制应用 |
+| **代码重复检测** | `code-quality-dry-standards.mdc` | 检测到重复代码 | 立即引用+DRY标准应用 |
 | **重复问题≥2次** | `<problem-type>-solutions.mdc` | 同类问题反复出现 | 记录问题+生成解决方案 |
 | **新功能域复杂化** | `<domain>-standards.mdc` | 功能复杂度超过阈值 | 提示生成+用户确认 |
 
@@ -277,6 +308,7 @@ function checkSpecializedRules(context) {
 | 价值观原则 | 强制执行条件 | 可适度调整条件 | 判断逻辑 |
 |------------|-------------|---------------|----------|
 | **规则遵循 > 开发便利** | 文件≥500行 OR 违反核心规则 | 无 - 绝对不可违背 | `if (file_lines >= 500) FORCE_SPLIT()` |
+| **DRY原则 > 开发速度** | 重复代码≥2次 OR 配置重复 | 原型开发的快速验证 | `if (code_duplication) FORCE_REFACTOR()` |
 | **质量 > 速度** | 生产环境 OR 核心业务逻辑 | 原型环境的快速验证 | `if (env == 'production') MAX_QUALITY()` |
 | **安全 > 便利** | 涉及权限/数据/密钥 | 开发环境的调试便利 | `if (involves_security) SECURITY_FIRST()` |
 | **团队协作 > 个人效率** | 多人协作项目 | 个人学习项目 | `if (team_project) READABLE_CODE()` |
@@ -289,12 +321,19 @@ function applyValuePrinciple(action, context) {
     return FORCE_FILE_SPLIT();
   }
   
+  // DRY 原则检查 - 优先执行 → 触发专用规则文件
+  const duplicationLevel = detectCodeDuplication(action, context);
+  if (duplicationLevel.severity !== 'none') {
+    FORCE_LOAD_SPECIALIZED_RULE('code-quality-dry-standards.mdc');
+    return APPLY_DRY_SPECIALIZED_STANDARDS(duplicationLevel, context);
+  }
+  
   // 安全优先检查
   if (action.involves_security || action.affects_permissions) {
     return REQUIRE_SECURITY_REVIEW();
   }
   
-  // 环境适应性检查
+    // 环境适应性检查  
   if (context.environment === 'production') {
     return APPLY_HIGHEST_STANDARDS();
   } else if (context.environment === 'prototype') {
@@ -303,6 +342,16 @@ function applyValuePrinciple(action, context) {
   
   // 默认平衡策略
   return BALANCED_APPROACH();
+}
+
+// DRY 原则快速检测 - 详细逻辑在专用规则文件中
+function detectCodeDuplication(action, context) {
+  // 基础重复检测 - 触发专用规则文件加载
+  if (action.involves_code_changes) {
+    const basicDuplication = quickDuplicationScan(action.code_changes);
+    return { severity: basicDuplication.detected ? 'detected' : 'none' };
+  }
+  return { severity: 'none' };
 }
 ```
 
